@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using System.Security.Cryptography.X509Certificates;
 
 namespace WinFormsApp1
 {       
@@ -24,11 +25,9 @@ namespace WinFormsApp1
         }   
 
         private void NewTaskBtn_Click(object sender, EventArgs e)
-        {
-            TextBox.ResetText();
-            UrgentTick.Checked = false;
-            DateTimePicker.Value = DateTime.Now; // Check if it resets properly
-            Deadline.Checked = false;
+        {   
+
+            ResetInput();
 
         }
 
@@ -80,9 +79,11 @@ namespace WinFormsApp1
 
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@taskDesc", "test");
-                    command.Parameters.AddWithValue("@isUrgent", "test");
-                    command.Parameters.AddWithValue("@taskDate", "test");
+                    command.Parameters.AddWithValue("@taskDesc", subs[0]);
+                    command.Parameters.AddWithValue("@isUrgent", subs[1]);
+                    command.Parameters.AddWithValue("@taskDate", subs[2]);
+
+                    command.ExecuteNonQuery();
                     Console.WriteLine("Inserted");
 
 
@@ -90,7 +91,8 @@ namespace WinFormsApp1
 
                 }
                 LoadTableData();
-                // Test if the task insertion to db is good
+                ResetInput();
+                
             }
 
         }
@@ -164,13 +166,23 @@ namespace WinFormsApp1
                     {
                         ListViewItem item = new ListViewItem(reader["taskDesc"].ToString());
                         item.SubItems.Add(reader["isUrgent"].ToString());
-                        item.SubItems.Add(reader["Date"].ToString());
+                        item.SubItems.Add(reader["taskDate"].ToString());
 
                         ListView.Items.Add(item);
                     }
                 }
             }
 
+        }
+
+        private void ResetInput()
+        {
+            
+            TextBox.ResetText();
+            UrgentTick.Checked = false;
+            DateTimePicker.Value = DateTime.Now;
+            Deadline.Checked = false;
+            
         }
 
 
