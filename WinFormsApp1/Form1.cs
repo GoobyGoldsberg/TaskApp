@@ -1,8 +1,7 @@
 using MySql.Data.MySqlClient;
-using System.Security.Cryptography.X509Certificates;
 
 namespace WinFormsApp1
-{       
+{
 
 
     public partial class TaskMaker : Form
@@ -10,7 +9,7 @@ namespace WinFormsApp1
     {
         private string connectionString = "server=127.0.0.1;uid=root;pwd=Darknes221;database=testdb";
         private static MySqlConnection? connection;
-        
+
 
         public TaskMaker()
         {
@@ -22,10 +21,10 @@ namespace WinFormsApp1
             ConnectToDb(connectionString);
             LoadTableData();
 
-        }   
+        }
 
         private void NewTaskBtn_Click(object sender, EventArgs e)
-        {   
+        {
 
             ResetInput();
 
@@ -49,7 +48,7 @@ namespace WinFormsApp1
                 TaskBuilder builder = new TaskBuilder();
                 director.TaskBuilder = builder;
 
-               
+
 
 
                 switch ((isUrgent, isDeadline))
@@ -92,7 +91,7 @@ namespace WinFormsApp1
                 }
                 LoadTableData();
                 ResetInput();
-                
+
             }
 
         }
@@ -140,7 +139,7 @@ namespace WinFormsApp1
         }
 
         private void ConnectToDb(string connectionString)
-        {   
+        {
             if (connection == null)
             {
                 connection = new();
@@ -149,13 +148,14 @@ namespace WinFormsApp1
                 Console.WriteLine("Connected to DB");
             }
 
-            
+
         }
 
         private void LoadTableData()
         {
+
             ListView.Items.Clear();
-            ListView.Columns.Clear();
+            
 
             string query = "SELECT taskDesc, isUrgent, taskDate FROM tasks";
             using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -164,9 +164,9 @@ namespace WinFormsApp1
                 {
                     while (reader.Read())
                     {
-                        ListViewItem item = new ListViewItem(reader["taskDesc"].ToString());
-                        item.SubItems.Add(reader["isUrgent"].ToString());
-                        item.SubItems.Add(reader["taskDate"].ToString());
+                        ListViewItem item = new ListViewItem(reader.GetString(0));
+                        item.SubItems.Add(reader.GetString(1));
+                        item.SubItems.Add(reader.GetString(2));
 
                         ListView.Items.Add(item);
                     }
@@ -175,16 +175,20 @@ namespace WinFormsApp1
 
         }
 
+
         private void ResetInput()
         {
-            
+
             TextBox.ResetText();
             UrgentTick.Checked = false;
             DateTimePicker.Value = DateTime.Now;
             Deadline.Checked = false;
-            
+
         }
 
+        private void ListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
+        }
     }
 }

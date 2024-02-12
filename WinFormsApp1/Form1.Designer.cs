@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            ColumnHeader Description;
+            Desc = new ColumnHeader();
+            isUrgent = new ColumnHeader();
+            Deadl = new ColumnHeader();
             newTaskBtn = new Button();
             editBtn = new Button();
             removeBtn = new Button();
@@ -39,10 +41,24 @@
             DateTimePicker = new DateTimePicker();
             Deadline = new CheckBox();
             ListView = new ListView();
-            isUrgent = new ColumnHeader();
-            Date = new ColumnHeader();
-            Description = new ColumnHeader();
             SuspendLayout();
+            // 
+            // Desc
+            // 
+            Desc.Tag = "";
+            Desc.Text = "Desc";
+            Desc.Width = 180;
+            // 
+            // isUrgent
+            // 
+            isUrgent.Tag = "";
+            isUrgent.Text = "isUrgent";
+            // 
+            // Deadl
+            // 
+            Deadl.Tag = "";
+            Deadl.Text = "Deadline";
+            Deadl.Width = 93;
             // 
             // newTaskBtn
             // 
@@ -145,34 +161,25 @@
             // 
             // ListView
             // 
-            ListView.Columns.AddRange(new ColumnHeader[] { Description, isUrgent, Date });
+            ListView.Columns.AddRange(new ColumnHeader[] { Desc, isUrgent, Deadl });
+            ListView.GridLines = true;
+            ListView.HoverSelection = true;
             ListView.Location = new Point(10, 205);
+            ListView.MultiSelect = false;
             ListView.Name = "ListView";
-            ListView.Size = new Size(334, 236);
+            ListView.Size = new Size(334, 238);
             ListView.TabIndex = 10;
+            ListView.TileSize = new Size(10, 10);
             ListView.UseCompatibleStateImageBehavior = false;
-            // 
-            // Description
-            // 
-            Description.Tag = "Description";
-            Description.Text = "Description";
-            // 
-            // isUrgent
-            // 
-            isUrgent.Tag = "isUrgent";
-            isUrgent.Text = "isUrgent";
-            // 
-            // Date
-            // 
-            Date.Tag = "Date";
-            Date.Text = "Date";
+            ListView.View = View.Details;
+            ListView.SelectedIndexChanged += ListView_SelectedIndexChanged;
             // 
             // TaskMaker
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Gainsboro;
-            ClientSize = new Size(353, 453);
+            ClientSize = new Size(353, 455);
             Controls.Add(ListView);
             Controls.Add(Deadline);
             Controls.Add(DateTimePicker);
@@ -183,8 +190,9 @@
             Controls.Add(removeBtn);
             Controls.Add(editBtn);
             Controls.Add(newTaskBtn);
+            FormBorderStyle = FormBorderStyle.Fixed3D;
             Name = "TaskMaker";
-            Text = "Form1";
+            Text = "Tasks";
             Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -202,7 +210,8 @@
         private DateTimePicker DateTimePicker;
         private CheckBox Deadline;
         private ListView ListView;
+        private ColumnHeader Desc;
         private ColumnHeader isUrgent;
-        private ColumnHeader Date;
+        private ColumnHeader Deadl;
     }
 }

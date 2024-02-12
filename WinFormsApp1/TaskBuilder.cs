@@ -23,8 +23,8 @@ namespace WinFormsApp1
 
         public void AddDate(DateTime? date)
         {
-            string formattedDate = date.HasValue ? date.Value.ToString() : "No Date";
-            this._task.Add(formattedDate.ToString());
+            string formattedDate = date.HasValue ? date.Value.ToString("dd/MM/yyyy") : "No Deadline";
+            this._task.Add(formattedDate);
         }
 
         public void AddDesc(string desc)
@@ -34,7 +34,7 @@ namespace WinFormsApp1
 
         public void AddIsUrgent(bool isUrgent)
         {
-            this._task.Add(isUrgent ? "true" : "false");
+            this._task.Add(isUrgent ? "Yes" : "No");
         }
 
         
@@ -50,7 +50,7 @@ namespace WinFormsApp1
        
 
         // DateTime date = new DateTime(2023, 3, 11, 10, 30, 0); 
-        // string formattedDate1 = date.ToString("d");  "3/11/2023" 
+        // string formattedDate1 = date.HasValue.ToString("d");  "3/11/2023" 
 
     }
 }
