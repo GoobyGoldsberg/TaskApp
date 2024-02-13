@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using System.Collections;
 
 namespace WinFormsApp1
 {
@@ -14,6 +15,8 @@ namespace WinFormsApp1
         public TaskMaker()
         {
             InitializeComponent();
+
+            list_view.ColumnClick += list_view_ColumnClick;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -154,8 +157,8 @@ namespace WinFormsApp1
         private void LoadTableData()
         {
 
-            ListView.Items.Clear();
-            
+            list_view.Items.Clear();
+
 
             string query = "SELECT taskDesc, isUrgent, taskDate FROM tasks";
             using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -168,7 +171,7 @@ namespace WinFormsApp1
                         item.SubItems.Add(reader.GetString(1));
                         item.SubItems.Add(reader.GetString(2));
 
-                        ListView.Items.Add(item);
+                        list_view.Items.Add(item);
                     }
                 }
             }
@@ -186,9 +189,41 @@ namespace WinFormsApp1
 
         }
 
-        private void ListView_SelectedIndexChanged(object sender, EventArgs e)
+        private void list_view_ColumnClick(object sender, ColumnClickEventArgs e)
         {
+            switch (e.Column)
+            {
+                case 0:
+                    SortByDescription();
+                    break;
+                case 1:
+                    SortByUrgent();
+                    break;
+                case 2:
+                    SortByDeadline();
+                    break;
+            }
 
         }
+
+        private void SortByDescription()
+        {
+            list_view.ListViewItemSorter = new ListViewItemComparer(0);
+            list_view.Sort();
+        }
+
+        private void SortByUrgent()
+        {
+            list_view.ListViewItemSorter = new ListViewItemComparer(1);
+            list_view.Sort();
+        }
+
+        private void SortByDeadline()
+        {
+            list_view.ListViewItemSorter = new ListViewItemComparer(2);
+            list_view.Sort();
+        }
+
+       
     }
 }

@@ -40,7 +40,7 @@
             SortByBox = new ComboBox();
             DateTimePicker = new DateTimePicker();
             Deadline = new CheckBox();
-            ListView = new ListView();
+            list_view = new ListView();
             SuspendLayout();
             // 
             // Desc
@@ -159,20 +159,21 @@
             Deadline.UseVisualStyleBackColor = true;
             Deadline.CheckedChanged += Deadline_CheckedChanged;
             // 
-            // ListView
+            // list_view
             // 
-            ListView.Columns.AddRange(new ColumnHeader[] { Desc, isUrgent, Deadl });
-            ListView.GridLines = true;
-            ListView.HoverSelection = true;
-            ListView.Location = new Point(10, 205);
-            ListView.MultiSelect = false;
-            ListView.Name = "ListView";
-            ListView.Size = new Size(334, 238);
-            ListView.TabIndex = 10;
-            ListView.TileSize = new Size(10, 10);
-            ListView.UseCompatibleStateImageBehavior = false;
-            ListView.View = View.Details;
-            ListView.SelectedIndexChanged += ListView_SelectedIndexChanged;
+            list_view.Columns.AddRange(new ColumnHeader[] { Desc, isUrgent, Deadl });
+            list_view.GridLines = true;
+            list_view.HoverSelection = true;
+            list_view.Location = new Point(10, 205);
+            list_view.MultiSelect = false;
+            list_view.Name = "list_view";
+            list_view.Size = new Size(334, 238);
+            list_view.TabIndex = 10;
+            list_view.TileSize = new Size(10, 10);
+            list_view.UseCompatibleStateImageBehavior = false;
+            list_view.View = View.Details;
+            list_view.ColumnClick += list_view_ColumnClick;
+            list_view.SelectedIndexChanged += SortBy_SelectedIndexChanged;
             // 
             // TaskMaker
             // 
@@ -180,7 +181,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Gainsboro;
             ClientSize = new Size(353, 455);
-            Controls.Add(ListView);
+            Controls.Add(list_view);
             Controls.Add(Deadline);
             Controls.Add(DateTimePicker);
             Controls.Add(SortByBox);
@@ -209,7 +210,7 @@
         private ComboBox SortByBox;
         private DateTimePicker DateTimePicker;
         private CheckBox Deadline;
-        private ListView ListView;
+        private ListView list_view;
         private ColumnHeader Desc;
         private ColumnHeader isUrgent;
         private ColumnHeader Deadl;
