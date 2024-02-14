@@ -37,7 +37,6 @@
             addTaskBtn = new Button();
             TextBox = new TextBox();
             UrgentTick = new CheckBox();
-            SortByBox = new ComboBox();
             DateTimePicker = new DateTimePicker();
             Deadline = new CheckBox();
             list_view = new ListView();
@@ -63,7 +62,7 @@
             // newTaskBtn
             // 
             newTaskBtn.FlatAppearance.BorderColor = SystemColors.ButtonFace;
-            newTaskBtn.Location = new Point(12, 58);
+            newTaskBtn.Location = new Point(22, 58);
             newTaskBtn.Name = "newTaskBtn";
             newTaskBtn.Size = new Size(75, 23);
             newTaskBtn.TabIndex = 0;
@@ -73,7 +72,7 @@
             // 
             // editBtn
             // 
-            editBtn.Location = new Point(12, 166);
+            editBtn.Location = new Point(22, 166);
             editBtn.Name = "editBtn";
             editBtn.Size = new Size(75, 23);
             editBtn.TabIndex = 1;
@@ -83,7 +82,7 @@
             // 
             // removeBtn
             // 
-            removeBtn.Location = new Point(269, 166);
+            removeBtn.Location = new Point(279, 166);
             removeBtn.Name = "removeBtn";
             removeBtn.Size = new Size(75, 23);
             removeBtn.TabIndex = 2;
@@ -93,7 +92,7 @@
             // 
             // addTaskBtn
             // 
-            addTaskBtn.Location = new Point(266, 58);
+            addTaskBtn.Location = new Point(276, 58);
             addTaskBtn.Name = "addTaskBtn";
             addTaskBtn.Size = new Size(75, 23);
             addTaskBtn.TabIndex = 3;
@@ -104,7 +103,7 @@
             // TextBox
             // 
             TextBox.Font = new Font("Segoe UI", 16F);
-            TextBox.Location = new Point(10, 12);
+            TextBox.Location = new Point(22, 12);
             TextBox.MaxLength = 23;
             TextBox.Multiline = true;
             TextBox.Name = "TextBox";
@@ -120,7 +119,7 @@
             UrgentTick.BackColor = Color.Gainsboro;
             UrgentTick.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             UrgentTick.ForeColor = Color.Crimson;
-            UrgentTick.Location = new Point(142, 58);
+            UrgentTick.Location = new Point(152, 58);
             UrgentTick.Name = "UrgentTick";
             UrgentTick.Size = new Size(66, 19);
             UrgentTick.TabIndex = 6;
@@ -128,20 +127,9 @@
             UrgentTick.UseVisualStyleBackColor = false;
             UrgentTick.CheckedChanged += UrgentTick_CheckedChanged;
             // 
-            // SortByBox
-            // 
-            SortByBox.FormattingEnabled = true;
-            SortByBox.Items.AddRange(new object[] { "Urgent", "Deadline", "New" });
-            SortByBox.Location = new Point(142, 166);
-            SortByBox.Name = "SortByBox";
-            SortByBox.Size = new Size(66, 23);
-            SortByBox.TabIndex = 7;
-            SortByBox.Text = "Sort by";
-            SortByBox.SelectedIndexChanged += SortBy_SelectedIndexChanged;
-            // 
             // DateTimePicker
             // 
-            DateTimePicker.Location = new Point(243, 87);
+            DateTimePicker.Location = new Point(253, 87);
             DateTimePicker.MinDate = new DateTime(2024, 1, 29, 0, 0, 0, 0);
             DateTimePicker.Name = "DateTimePicker";
             DateTimePicker.Size = new Size(98, 23);
@@ -151,7 +139,7 @@
             // 
             // Deadline
             // 
-            Deadline.Location = new Point(142, 87);
+            Deadline.Location = new Point(152, 87);
             Deadline.Name = "Deadline";
             Deadline.Size = new Size(78, 23);
             Deadline.TabIndex = 9;
@@ -162,9 +150,10 @@
             // list_view
             // 
             list_view.Columns.AddRange(new ColumnHeader[] { Desc, isUrgent, Deadl });
+            list_view.FullRowSelect = true;
             list_view.GridLines = true;
             list_view.HoverSelection = true;
-            list_view.Location = new Point(10, 205);
+            list_view.Location = new Point(22, 205);
             list_view.MultiSelect = false;
             list_view.Name = "list_view";
             list_view.Size = new Size(334, 238);
@@ -180,11 +169,10 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Gainsboro;
-            ClientSize = new Size(353, 455);
+            ClientSize = new Size(380, 455);
             Controls.Add(list_view);
             Controls.Add(Deadline);
             Controls.Add(DateTimePicker);
-            Controls.Add(SortByBox);
             Controls.Add(UrgentTick);
             Controls.Add(TextBox);
             Controls.Add(addTaskBtn);
@@ -207,7 +195,6 @@
         private Button addTaskBtn;
         private TextBox TextBox;
         private CheckBox UrgentTick;
-        private ComboBox SortByBox;
         private DateTimePicker DateTimePicker;
         private CheckBox Deadline;
         private ListView list_view;

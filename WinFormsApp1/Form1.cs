@@ -107,6 +107,29 @@ namespace WinFormsApp1
         private void RemoveBtn_Click(object sender, EventArgs e)
         {
 
+            int taskId = (int)list_view.SelectedItems[0].Tag!;
+
+            DeleteTaskFromDb(taskId);
+
+            list_view.Items.Remove(list_view.SelectedItems[0]);
+        }
+
+        private void DeleteTaskFromDb(int taskId)
+        {
+            try
+            {
+                string query = "DELETE from tasks WHERE task_ID = @task_ID";
+                
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@task_ID", taskId);
+                    command.ExecuteNonQuery();
+                }
+
+            } catch (Exception ex)
+            {
+                throw new Exception();
+            }
         }
 
         private void Deadline_CheckedChanged(object sender, EventArgs e)
@@ -160,16 +183,18 @@ namespace WinFormsApp1
             list_view.Items.Clear();
 
 
-            string query = "SELECT taskDesc, isUrgent, taskDate FROM tasks";
+            string query = "SELECT * FROM tasks";
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        ListViewItem item = new ListViewItem(reader.GetString(0));
-                        item.SubItems.Add(reader.GetString(1));
+                        ListViewItem item = new ListViewItem(reader.GetString(1));
                         item.SubItems.Add(reader.GetString(2));
+                        item.SubItems.Add(reader.GetString(3));
+
+                        item.Tag = reader.GetInt32(0);
 
                         list_view.Items.Add(item);
                     }
@@ -211,6 +236,7 @@ namespace WinFormsApp1
             list_view.ListViewItemSorter = new ListViewItemComparer(0);
             list_view.Sort();
         }
+
 
         private void SortByUrgent()
         {
