@@ -57,7 +57,7 @@
             // 
             Deadl.Tag = "";
             Deadl.Text = "Deadline";
-            Deadl.Width = 93;
+            Deadl.Width = 91;
             // 
             // newTaskBtn
             // 
@@ -149,16 +149,20 @@
             // 
             // list_view
             // 
+            list_view.Activation = ItemActivation.OneClick;
+            list_view.BorderStyle = BorderStyle.FixedSingle;
             list_view.Columns.AddRange(new ColumnHeader[] { Desc, isUrgent, Deadl });
+            list_view.Font = new Font("Segoe UI", 9F);
             list_view.FullRowSelect = true;
             list_view.GridLines = true;
-            list_view.HoverSelection = true;
+            list_view.ImeMode = ImeMode.NoControl;
             list_view.Location = new Point(22, 205);
+            list_view.Margin = new Padding(5);
             list_view.MultiSelect = false;
             list_view.Name = "list_view";
             list_view.Size = new Size(334, 238);
             list_view.TabIndex = 10;
-            list_view.TileSize = new Size(10, 10);
+            list_view.TileSize = new Size(5, 5);
             list_view.UseCompatibleStateImageBehavior = false;
             list_view.View = View.Details;
             list_view.ColumnClick += list_view_ColumnClick;
