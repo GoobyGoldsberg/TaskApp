@@ -33,13 +33,15 @@
             Deadl = new ColumnHeader();
             newTaskBtn = new Button();
             editBtn = new Button();
-            removeBtn = new Button();
             addTaskBtn = new Button();
             TextBox = new TextBox();
             UrgentTick = new CheckBox();
             DateTimePicker = new DateTimePicker();
             Deadline = new CheckBox();
             list_view = new ListView();
+            UpdateBtn = new Button();
+            Label = new Label();
+            DeleteBtn = new Button();
             SuspendLayout();
             // 
             // Desc
@@ -72,7 +74,7 @@
             // 
             // editBtn
             // 
-            editBtn.Location = new Point(22, 166);
+            editBtn.Location = new Point(22, 174);
             editBtn.Name = "editBtn";
             editBtn.Size = new Size(75, 23);
             editBtn.TabIndex = 1;
@@ -80,19 +82,9 @@
             editBtn.UseVisualStyleBackColor = true;
             editBtn.Click += EditBtn_Click;
             // 
-            // removeBtn
-            // 
-            removeBtn.Location = new Point(279, 166);
-            removeBtn.Name = "removeBtn";
-            removeBtn.Size = new Size(75, 23);
-            removeBtn.TabIndex = 2;
-            removeBtn.Text = "Remove";
-            removeBtn.UseVisualStyleBackColor = true;
-            removeBtn.Click += RemoveBtn_Click;
-            // 
             // addTaskBtn
             // 
-            addTaskBtn.Location = new Point(276, 58);
+            addTaskBtn.Location = new Point(281, 58);
             addTaskBtn.Name = "addTaskBtn";
             addTaskBtn.Size = new Size(75, 23);
             addTaskBtn.TabIndex = 3;
@@ -111,7 +103,6 @@
             TextBox.Size = new Size(334, 40);
             TextBox.TabIndex = 4;
             TextBox.TextAlign = HorizontalAlignment.Center;
-            TextBox.TextChanged += TextBox_TextChanged;
             // 
             // UrgentTick
             // 
@@ -125,17 +116,15 @@
             UrgentTick.TabIndex = 6;
             UrgentTick.Text = "Urgent";
             UrgentTick.UseVisualStyleBackColor = false;
-            UrgentTick.CheckedChanged += UrgentTick_CheckedChanged;
             // 
             // DateTimePicker
             // 
-            DateTimePicker.Location = new Point(253, 87);
+            DateTimePicker.Location = new Point(258, 87);
             DateTimePicker.MinDate = new DateTime(2024, 1, 29, 0, 0, 0, 0);
             DateTimePicker.Name = "DateTimePicker";
             DateTimePicker.Size = new Size(98, 23);
             DateTimePicker.TabIndex = 8;
             DateTimePicker.Visible = false;
-            DateTimePicker.ValueChanged += DateTimePicker_ValueChanged;
             // 
             // Deadline
             // 
@@ -166,7 +155,38 @@
             list_view.UseCompatibleStateImageBehavior = false;
             list_view.View = View.Details;
             list_view.ColumnClick += list_view_ColumnClick;
-            list_view.SelectedIndexChanged += SortBy_SelectedIndexChanged;
+            // 
+            // UpdateBtn
+            // 
+            UpdateBtn.Enabled = false;
+            UpdateBtn.Location = new Point(281, 58);
+            UpdateBtn.Name = "UpdateBtn";
+            UpdateBtn.Size = new Size(75, 23);
+            UpdateBtn.TabIndex = 11;
+            UpdateBtn.Text = "Update";
+            UpdateBtn.UseVisualStyleBackColor = true;
+            UpdateBtn.Visible = false;
+            UpdateBtn.Click += UpdateBtn_Click;
+            // 
+            // Label
+            // 
+            Label.AutoSize = true;
+            Label.ForeColor = Color.Crimson;
+            Label.Location = new Point(127, 127);
+            Label.Name = "Label";
+            Label.Size = new Size(0, 15);
+            Label.TabIndex = 12;
+            Label.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // DeleteBtn
+            // 
+            DeleteBtn.Location = new Point(281, 174);
+            DeleteBtn.Name = "DeleteBtn";
+            DeleteBtn.Size = new Size(75, 23);
+            DeleteBtn.TabIndex = 13;
+            DeleteBtn.Text = "Delete";
+            DeleteBtn.UseVisualStyleBackColor = true;
+            DeleteBtn.Click += DeleteBtn_Click;
             // 
             // TaskMaker
             // 
@@ -174,13 +194,15 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Gainsboro;
             ClientSize = new Size(380, 455);
+            Controls.Add(DeleteBtn);
+            Controls.Add(Label);
+            Controls.Add(UpdateBtn);
             Controls.Add(list_view);
             Controls.Add(Deadline);
             Controls.Add(DateTimePicker);
             Controls.Add(UrgentTick);
             Controls.Add(TextBox);
             Controls.Add(addTaskBtn);
-            Controls.Add(removeBtn);
             Controls.Add(editBtn);
             Controls.Add(newTaskBtn);
             FormBorderStyle = FormBorderStyle.Fixed3D;
@@ -195,7 +217,6 @@
 
         private Button newTaskBtn;
         private Button editBtn;
-        private Button removeBtn;
         private Button addTaskBtn;
         private TextBox TextBox;
         private CheckBox UrgentTick;
@@ -205,5 +226,8 @@
         private ColumnHeader Desc;
         private ColumnHeader isUrgent;
         private ColumnHeader Deadl;
+        private Button UpdateBtn;
+        private Label Label;
+        private Button DeleteBtn;
     }
 }

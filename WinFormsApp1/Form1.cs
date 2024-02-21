@@ -1,5 +1,7 @@
 using MySql.Data.MySqlClient;
 using System.Collections;
+using System.Security.AccessControl;
+using System.Threading.Tasks;
 
 namespace WinFormsApp1
 {
@@ -16,13 +18,28 @@ namespace WinFormsApp1
         {
             InitializeComponent();
 
-            list_view.ColumnClick += list_view_ColumnClick;
+            list_view.ColumnClick += list_view_ColumnClick!;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             ConnectToDb(connectionString);
             LoadTableData();
+
+        }
+
+        private void ResetInput()
+        {
+
+            TextBox.ResetText();
+            UrgentTick.Checked = false;
+            DateTimePicker.Value = DateTime.Now;
+            Deadline.Checked = false;
+            addTaskBtn.Enabled = true;
+            addTaskBtn.Visible = true;
+            UpdateBtn.Enabled = false;
+            UpdateBtn.Visible = false;
+
 
         }
 
@@ -33,103 +50,165 @@ namespace WinFormsApp1
 
         }
 
-        private void AddTaskBtn_Click(object sender, EventArgs e)
+        private string[] CreateTask()
         {
-
-
-            string query = "INSERT INTO tasks (taskDesc, isUrgent, taskDate) VALUES (@taskDesc, @isUrgent, @taskDate)";
-
             string taskDesc = TextBox.Text;
             bool isUrgent = UrgentTick.Checked;
             bool isDeadline = Deadline.Checked;
             DateTime taskDate;
 
-            if (taskDesc.Length > 0)
+
+
+            TaskDirector director = new TaskDirector();
+            TaskBuilder builder = new TaskBuilder();
+            director.TaskBuilder = builder;
+
+            switch ((isUrgent, isDeadline))
             {
+                case (true, true):
+                    taskDate = DateTimePicker.Value;
+                    director.BuildFullFeaturedTask(taskDesc, isUrgent, taskDate);
+                    break;
+                case (true, false):
+                    director.BuildAnUrgentTask(taskDesc, isUrgent);
+                    break;
+                case (false, true):
+                    taskDate = DateTimePicker.Value;
+                    director.BuildDeadlinedTask(taskDesc, taskDate);
+                    break;
+                case (false, false):
+                    director.BuildMinimalViableTask(taskDesc);
+                    break;
+            }
 
-                TaskDirector director = new TaskDirector();
-                TaskBuilder builder = new TaskBuilder();
-                director.TaskBuilder = builder;
-
-
-
-
-                switch ((isUrgent, isDeadline))
-                {
-                    case (true, true):
-                        taskDate = DateTimePicker.Value;
-                        director.BuildFullFeaturedTask(taskDesc, isUrgent, taskDate);
-                        break;
-                    case (true, false):
-                        director.BuildAnUrgentTask(taskDesc, isUrgent);
-                        break;
-                    case (false, true):
-                        taskDate = DateTimePicker.Value;
-                        director.BuildDeadlinedTask(taskDesc, taskDate);
-                        break;
-                    case (false, false):
-                        director.BuildMinimalViableTask(taskDesc);
-                        break;
-                }
-
-                Task newTask = builder.GetTask();
+            Task newTask = builder.GetTask();
 
 
-                string[] subs = newTask.ReturnParts();
+            string[] taskParts = newTask.ReturnParts();
+
+            return taskParts;
 
 
 
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@taskDesc", subs[0]);
-                    command.Parameters.AddWithValue("@isUrgent", subs[1]);
-                    command.Parameters.AddWithValue("@taskDate", subs[2]);
+        }
 
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Inserted");
+        private void AddTaskBtn_Click(object sender, EventArgs e)
+        {
+            if (TextBox.Text.Length < 1)
+            {
+                Label.Text = "To-Do field cannot be empty";
+                return;
+            }
+
+            string[] taskParts = CreateTask();
+
+            string query = "INSERT INTO tasks (taskDesc, isUrgent, taskDate) VALUES (@taskDesc, @isUrgent, @taskDate)";
+
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@taskDesc", taskParts[0]);
+                command.Parameters.AddWithValue("@isUrgent", taskParts[1]);
+                command.Parameters.AddWithValue("@taskDate", taskParts[2]);
+
+                command.ExecuteNonQuery();
+                Console.WriteLine("Inserted");
 
 
 
-
-                }
-                LoadTableData();
-                ResetInput();
 
             }
+            LoadTableData();
+            ResetInput();
+
+
 
         }
 
         private void EditBtn_Click(object sender, EventArgs e)
         {
 
+            if (list_view.SelectedItems.Count == 0)
+            {
+                Label.Text = "Please select a Task first";
+                return;
+            }
+
+            addTaskBtn.Enabled = false;
+            addTaskBtn.Visible = false;
+            UpdateBtn.Enabled = true;
+            UpdateBtn.Visible = true;
+
+
         }
 
-        private void RemoveBtn_Click(object sender, EventArgs e)
+        private void UpdateBtn_Click(object sender, EventArgs e)
         {
+            if (TextBox.Text.Length < 1)
+            {
+                Label.Text = "To-Do field cannot be empty";
+                return;
+            }
 
-            int taskId = (int)list_view.SelectedItems[0].Tag!;
+            UpdateTask();
+            Console.WriteLine("Task Updated");
+            LoadTableData();
+            ResetInput();
 
-            DeleteTaskFromDb(taskId);
+        }
+
+        private void UpdateTask()
+        {
+            int task_ID = GetSelectedTaskId();
+
+
+            string[] taskParts = CreateTask();
+
+            string query = "UPDATE tasks SET taskDesc=@taskDesc, isUrgent=@isUrgent, taskDate=@taskDate WHERE task_ID=@task_ID";
+
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("taskDesc", taskParts[0]);
+                command.Parameters.AddWithValue("isUrgent", taskParts[1]);
+                command.Parameters.AddWithValue("taskDate", taskParts[2]);
+                command.Parameters.AddWithValue("task_ID", task_ID);
+                command.ExecuteNonQuery();
+            }
+
+        }
+
+        private void DeleteBtn_Click(object sender, EventArgs e)
+        {
+            if (list_view.SelectedItems.Count == 0)
+            {
+                Label.Text = "Please select a Task first";
+                return;
+            }
+            DeleteTaskFromDb(GetSelectedTaskId());
 
             list_view.Items.Remove(list_view.SelectedItems[0]);
         }
+        private int GetSelectedTaskId()
+        {
+
+            return (int)list_view.SelectedItems[0].Tag!;
+
+        }
+
 
         private void DeleteTaskFromDb(int taskId)
         {
-            try
-            {
-                string query = "DELETE from tasks WHERE task_ID = @task_ID";
-                
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@task_ID", taskId);
-                    command.ExecuteNonQuery();
-                }
+            int task_ID = GetSelectedTaskId();
 
-            } catch (Exception ex)
+            string query = "DELETE from tasks WHERE task_ID = @task_ID";
+
+            using (MySqlCommand command = new MySqlCommand(query, connection))
             {
-                throw new Exception();
+                command.Parameters.AddWithValue("@task_ID", taskId);
+                command.ExecuteNonQuery();
             }
+
+            
+            
         }
 
         private void Deadline_CheckedChanged(object sender, EventArgs e)
@@ -144,25 +223,6 @@ namespace WinFormsApp1
             }
         }
 
-        private void SortBy_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void DateTimePicker_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void TextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void UrgentTick_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void ConnectToDb(string connectionString)
         {
@@ -204,15 +264,7 @@ namespace WinFormsApp1
         }
 
 
-        private void ResetInput()
-        {
 
-            TextBox.ResetText();
-            UrgentTick.Checked = false;
-            DateTimePicker.Value = DateTime.Now;
-            Deadline.Checked = false;
-
-        }
 
         private void list_view_ColumnClick(object sender, ColumnClickEventArgs e)
         {
@@ -250,6 +302,6 @@ namespace WinFormsApp1
             list_view.Sort();
         }
 
-       
+        
     }
 }
