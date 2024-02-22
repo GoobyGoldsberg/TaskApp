@@ -12,7 +12,7 @@ namespace WinFormsApp1
     {
         private string connectionString = "server=127.0.0.1;uid=root;pwd=Darknes221;database=testdb";
         private static MySqlConnection? connection;
-
+        private static DbConnection dbConnection = new();
 
         public TaskMaker()
         {
@@ -23,7 +23,8 @@ namespace WinFormsApp1
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ConnectToDb(connectionString);
+            
+            dbConnection.ConnectToDb();
             LoadTableData();
 
         }
@@ -56,8 +57,6 @@ namespace WinFormsApp1
             bool isUrgent = UrgentTick.Checked;
             bool isDeadline = Deadline.Checked;
             DateTime taskDate;
-
-
 
             TaskDirector director = new TaskDirector();
             TaskBuilder builder = new TaskBuilder();
@@ -99,24 +98,10 @@ namespace WinFormsApp1
                 Label.Text = "To-Do field cannot be empty";
                 return;
             }
-
-            string[] taskParts = CreateTask();
-
-            string query = "INSERT INTO tasks (taskDesc, isUrgent, taskDate) VALUES (@taskDesc, @isUrgent, @taskDate)";
-
-            using (MySqlCommand command = new MySqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@taskDesc", taskParts[0]);
-                command.Parameters.AddWithValue("@isUrgent", taskParts[1]);
-                command.Parameters.AddWithValue("@taskDate", taskParts[2]);
-
-                command.ExecuteNonQuery();
-                Console.WriteLine("Inserted");
-
-
-
-
-            }
+            string[] newTask = CreateTask();
+            AddTaskCommand addTask = new AddTaskCommand(newTask);
+            addTask.Execute();
+            
             LoadTableData();
             ResetInput();
 
@@ -244,7 +229,7 @@ namespace WinFormsApp1
 
 
             string query = "SELECT * FROM tasks";
-            using (MySqlCommand command = new MySqlCommand(query, connection))
+            using (MySqlCommand command = new MySqlCommand(query, dbConnection.GetConnection()))
             {
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
