@@ -10,9 +10,10 @@ namespace WinFormsApp1
     public partial class TaskMaker : Form
 
     {
-        private string connectionString = "server=127.0.0.1;uid=root;pwd=Darknes221;database=testdb";
-        private static MySqlConnection? connection;
         private static DbConnection dbConnection = new();
+        private ICommand addCommand;
+        private ICommand removeCommand;
+        private ICommand updateCommand;
 
         public TaskMaker()
         {
@@ -145,19 +146,10 @@ namespace WinFormsApp1
         {
             int task_ID = GetSelectedTaskId();
 
-
             string[] taskParts = CreateTask();
 
-            string query = "UPDATE tasks SET taskDesc=@taskDesc, isUrgent=@isUrgent, taskDate=@taskDate WHERE task_ID=@task_ID";
-
-            using (MySqlCommand command = new MySqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("taskDesc", taskParts[0]);
-                command.Parameters.AddWithValue("isUrgent", taskParts[1]);
-                command.Parameters.AddWithValue("taskDate", taskParts[2]);
-                command.Parameters.AddWithValue("task_ID", task_ID);
-                command.ExecuteNonQuery();
-            }
+            UpdateTaskCommand updateTask = new UpdateTaskCommand(task_ID, taskParts);
+            updateTask.Execute();
 
         }
 
@@ -168,7 +160,9 @@ namespace WinFormsApp1
                 Label.Text = "Please select a Task first";
                 return;
             }
-            DeleteTaskFromDb(GetSelectedTaskId());
+
+            RemoveTaskCommand removeTask = new RemoveTaskCommand(GetSelectedTaskId());
+            removeTask.Execute();
 
             list_view.Items.Remove(list_view.SelectedItems[0]);
         }
@@ -179,22 +173,7 @@ namespace WinFormsApp1
 
         }
 
-
-        private void DeleteTaskFromDb(int taskId)
-        {
-            int task_ID = GetSelectedTaskId();
-
-            string query = "DELETE from tasks WHERE task_ID = @task_ID";
-
-            using (MySqlCommand command = new MySqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@task_ID", taskId);
-                command.ExecuteNonQuery();
-            }
-
-            
-            
-        }
+        
 
         private void Deadline_CheckedChanged(object sender, EventArgs e)
         {
@@ -208,19 +187,6 @@ namespace WinFormsApp1
             }
         }
 
-
-        private void ConnectToDb(string connectionString)
-        {
-            if (connection == null)
-            {
-                connection = new();
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Console.WriteLine("Connected to DB");
-            }
-
-
-        }
 
         private void LoadTableData()
         {
