@@ -61,30 +61,7 @@ namespace WinFormsApp1
 
             CreateCommand createTask = new CreateCommand(taskDesc, isUrgent, isDeadline, DateTimePicker);
 
-            switch ((isUrgent, isDeadline))
-            {
-                case (true, true):
-                    taskDate = DateTimePicker.Value;
-                    director.BuildFullFeaturedTask(taskDesc, isUrgent, taskDate);
-                    break;
-                case (true, false):
-                    director.BuildAnUrgentTask(taskDesc, isUrgent);
-                    break;
-                case (false, true):
-                    taskDate = DateTimePicker.Value;
-                    director.BuildDeadlinedTask(taskDesc, taskDate);
-                    break;
-                case (false, false):
-                    director.BuildMinimalViableTask(taskDesc);
-                    break;
-            }
-
-            Task newTask = builder.GetTask();
-
-
-            string[] taskParts = newTask.ReturnParts();
-
-            return taskParts;
+            string[] newTask = createTask.Execute();
 
             return newTask;
 
