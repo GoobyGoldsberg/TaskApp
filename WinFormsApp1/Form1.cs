@@ -2,6 +2,7 @@ using MySql.Data.MySqlClient;
 using System.Collections;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace WinFormsApp1
 {
@@ -11,9 +12,9 @@ namespace WinFormsApp1
 
     {
         private static DbConnection dbConnection = new();
-        private ICommand addCommand;
-        private ICommand removeCommand;
-        private ICommand updateCommand;
+        private ICommand? addCommand;
+        private ICommand? removeCommand;
+        private ICommand? updateCommand;
 
         public TaskMaker()
         {
@@ -57,37 +58,12 @@ namespace WinFormsApp1
             string taskDesc = TextBox.Text;
             bool isUrgent = UrgentTick.Checked;
             bool isDeadline = Deadline.Checked;
-            DateTime taskDate;
 
-            TaskDirector director = new TaskDirector();
-            TaskBuilder builder = new TaskBuilder();
-            director.TaskBuilder = builder;
+            CreateCommand createTask = new CreateCommand(taskDesc, isUrgent, isDeadline, DateTimePicker);
 
-            switch ((isUrgent, isDeadline))
-            {
-                case (true, true):
-                    taskDate = DateTimePicker.Value;
-                    director.BuildFullFeaturedTask(taskDesc, isUrgent, taskDate);
-                    break;
-                case (true, false):
-                    director.BuildAnUrgentTask(taskDesc, isUrgent);
-                    break;
-                case (false, true):
-                    taskDate = DateTimePicker.Value;
-                    director.BuildDeadlinedTask(taskDesc, taskDate);
-                    break;
-                case (false, false):
-                    director.BuildMinimalViableTask(taskDesc);
-                    break;
-            }
+            string[] newTask = createTask.Execute();
 
-            Task newTask = builder.GetTask();
-
-
-            string[] taskParts = newTask.ReturnParts();
-
-            return taskParts;
-
+            return newTask;
 
 
         }
@@ -100,13 +76,11 @@ namespace WinFormsApp1
                 return;
             }
             string[] newTask = CreateTask();
-            AddTaskCommand addTask = new AddTaskCommand(newTask);
-            addTask.Execute();
+            addCommand = new AddTaskCommand(newTask);
+            addCommand.Execute();
             
             LoadTableData();
             ResetInput();
-
-
 
         }
 
@@ -135,23 +109,17 @@ namespace WinFormsApp1
                 return;
             }
 
-            UpdateTask();
+            string[] newTask = CreateTask();
+            int selectedTask = GetSelectedTaskId();
+            updateCommand = new UpdateTaskCommand(selectedTask, newTask);
+            updateCommand.Execute();
+
             Console.WriteLine("Task Updated");
             LoadTableData();
             ResetInput();
 
         }
 
-        private void UpdateTask()
-        {
-            int task_ID = GetSelectedTaskId();
-
-            string[] taskParts = CreateTask();
-
-            UpdateTaskCommand updateTask = new UpdateTaskCommand(task_ID, taskParts);
-            updateTask.Execute();
-
-        }
 
         private void DeleteBtn_Click(object sender, EventArgs e)
         {
@@ -161,11 +129,12 @@ namespace WinFormsApp1
                 return;
             }
 
-            RemoveTaskCommand removeTask = new RemoveTaskCommand(GetSelectedTaskId());
-            removeTask.Execute();
+            removeCommand = new RemoveTaskCommand(GetSelectedTaskId());
+            removeCommand.Execute();
 
             list_view.Items.Remove(list_view.SelectedItems[0]);
         }
+
         private int GetSelectedTaskId()
         {
 
@@ -192,67 +161,34 @@ namespace WinFormsApp1
         {
 
             list_view.Items.Clear();
-
-
-            string query = "SELECT * FROM tasks";
-            using (MySqlCommand command = new MySqlCommand(query, dbConnection.GetConnection()))
-            {
-                using (MySqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        ListViewItem item = new ListViewItem(reader.GetString(1));
-                        item.SubItems.Add(reader.GetString(2));
-                        item.SubItems.Add(reader.GetString(3));
-
-                        item.Tag = reader.GetInt32(0);
-
-                        list_view.Items.Add(item);
-                    }
-                }
-            }
-
+            LoadData loadData = new LoadData();
+            loadData.LoadTasksIntoListView(list_view);
+ 
         }
-
-
-
 
         private void list_view_ColumnClick(object sender, ColumnClickEventArgs e)
         {
+            ISortBy strategy;
+
             switch (e.Column)
             {
                 case 0:
-                    SortByDescription();
+                    strategy = new SortByDescription();
+                    strategy.SortBy(list_view);
                     break;
                 case 1:
-                    SortByUrgent();
+                    strategy = new SortByUrgent();
+                    strategy.SortBy(list_view);
                     break;
                 case 2:
-                    SortByDeadline();
+                    strategy = new SortByDeadline();
+                    strategy.SortBy(list_view);
                     break;
             }
 
         }
 
-        private void SortByDescription()
-        {
-            list_view.ListViewItemSorter = new ListViewItemComparer(0);
-            list_view.Sort();
-        }
-
-
-        private void SortByUrgent()
-        {
-            list_view.ListViewItemSorter = new ListViewItemComparer(1);
-            list_view.Sort();
-        }
-
-        private void SortByDeadline()
-        {
-            list_view.ListViewItemSorter = new ListViewItemComparer(2);
-            list_view.Sort();
-        }
-
+        
         
     }
 }
