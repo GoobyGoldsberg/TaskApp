@@ -2,6 +2,7 @@ using MySql.Data.MySqlClient;
 using System.Collections;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace WinFormsApp1
 {
@@ -57,11 +58,8 @@ namespace WinFormsApp1
             string taskDesc = TextBox.Text;
             bool isUrgent = UrgentTick.Checked;
             bool isDeadline = Deadline.Checked;
-            DateTime taskDate;
 
-            TaskDirector director = new TaskDirector();
-            TaskBuilder builder = new TaskBuilder();
-            director.TaskBuilder = builder;
+            CreateCommand createTask = new CreateCommand(taskDesc, isUrgent, isDeadline, DateTimePicker);
 
             switch ((isUrgent, isDeadline))
             {
@@ -87,6 +85,9 @@ namespace WinFormsApp1
             string[] taskParts = newTask.ReturnParts();
 
             return taskParts;
+
+            return newTask;
+
 
         }
 
